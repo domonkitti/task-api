@@ -9,6 +9,11 @@ require (
 )
 
 require (
+	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
+)
+
+require (
 	github.com/bytedance/sonic v1.12.1 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect

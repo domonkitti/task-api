@@ -49,3 +49,19 @@ func (repo Repository) FindByID(id uint) (model.Item, error) {
 func (repo Repository) Replace(item model.Item) error {
 	return repo.Database.Model(&item).Updates(item).Error
 }
+
+func (repo Repository) DeleteByID(id uint) error {
+    var item model.Item
+
+    // ตรวจสอบว่าไอเท็มมีอยู่หรือไม่
+    if err := repo.Database.First(&item, id).Error; err != nil {
+        return err // ถ้าไม่พบไอเท็ม ให้ส่งคืนข้อผิดพลาด
+    }
+
+    // ลบไอเท็ม
+    if err := repo.Database.Delete(&item).Error; err != nil {
+        return err
+    }
+
+    return nil
+}

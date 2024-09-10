@@ -4,7 +4,8 @@ import "task-api/internal/constant"
 
 type RequestItem struct {
 	Title    string  `binding:"required"`
-	Price    float64 `binding:"gte=5"`
+	Amount    float64 
+	//`binding:"gte=5"`
 	Quantity uint
 }
 
@@ -14,6 +15,12 @@ type RequestFindItem struct {
 
 type RequestUpdateItem struct {
 	Status constant.ItemStatus
+}
+
+type RequestUpdateIteminfo struct {
+	Title    string  `json:"title"`
+    Amount    float64 `json:"Amount"`
+    Quantity uint     `json:"quantity"`
 }
 
 type RequestLogin struct {
