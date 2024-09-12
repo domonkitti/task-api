@@ -11,6 +11,9 @@ type RequestItem struct {
 
 type RequestFindItem struct {
 	Statuses constant.ItemStatus `form:"status"`
+	Title    string `form:"title"`
+
+
 }
 
 type RequestUpdateItem struct {

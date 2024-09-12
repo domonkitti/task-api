@@ -35,7 +35,7 @@ func (service Service) Create(req model.RequestItem) (model.Item, error) {
 func (service Service) Find(query model.RequestFindItem) ([]model.Item, error) {
 	return service.Repository.Find(query)
 }
-//ค้นหา Item
+//ค้นหา Item จากไอดีหนึาง
 func (service Service) FindByID(id uint) (model.Item, error) {
     return service.Repository.FindByID(id)
 }

@@ -76,13 +76,11 @@ func (controller Controller) CreateItem(ctx *gin.Context) {
 	// Response
 	ctx.JSON(http.StatusCreated, item,)
 }
-//ทั้งหาและเรียกไอเทมทั้งหมด
+//ทั้งหาและเรียกไอเทมทั้งหมด ตัวอย่างการส่ง query ?title=
 func (controller Controller) FindItems(ctx *gin.Context) {
 	// Bind query parameters
-	var (
-		request model.RequestFindItem
-	)
-
+	var	request model.RequestFindItem
+	
 	if err := ctx.BindQuery(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err,
@@ -101,7 +99,7 @@ func (controller Controller) FindItems(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK,items,)
 }
-//หาไอเทมชิ้นเดียว
+//หาไอเทมชิ้นเดียว ตัวอย่างการส่ง paramitorหลัง/
 func (controller Controller) FindItemByID(ctx *gin.Context) {
     id, err := strconv.Atoi(ctx.Param("id"))
     if err != nil {

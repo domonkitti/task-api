@@ -1,5 +1,5 @@
 -- +goose Up
-ALTER TABLE items ADD price real NOT NULL;
+ALTER TABLE items ADD amount real NOT NULL;
 
 ALTER TABLE items ADD status text NOT NULL;
 
@@ -10,7 +10,7 @@ SELECT
 -- +goose StatementEnd
 -- +goose Down
 ALTER TABLE items
-DROP COLUMN price;
+DROP COLUMN amount;
 
 ALTER TABLE items
 DROP COLUMN status;
