@@ -74,7 +74,9 @@ func (controller Controller) CreateItem(ctx *gin.Context) {
 	}
 
 	// Response
-	ctx.JSON(http.StatusCreated, item,)
+	ctx.JSON(http.StatusCreated, gin.H{
+		"data": item,
+	})
 }
 //ทั้งหาและเรียกไอเทมทั้งหมด ตัวอย่างการส่ง query ?title=
 func (controller Controller) FindItems(ctx *gin.Context) {
@@ -97,7 +99,8 @@ func (controller Controller) FindItems(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK,items,)
+	ctx.JSON(http.StatusOK,gin.H{
+		"data":items,})
 }
 //หาไอเทมชิ้นเดียว ตัวอย่างการส่ง paramitorหลัง/
 func (controller Controller) FindItemByID(ctx *gin.Context) {
@@ -117,7 +120,8 @@ func (controller Controller) FindItemByID(ctx *gin.Context) {
         return
     }
 
-    ctx.JSON(http.StatusOK,item,)
+    ctx.JSON(http.StatusOK,gin.H{
+		"data":item,})
 }
 
 //อัพเดท status
@@ -146,7 +150,8 @@ func (controller Controller) UpdateItemStatus(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, item,)
+	ctx.JSON(http.StatusOK,gin.H{
+		"data": item},)
 }
 //อัพเดทข้อมูลทั่วไป
 func (controller Controller) UpdateIteminfo(ctx *gin.Context) {
@@ -169,7 +174,9 @@ func (controller Controller) UpdateIteminfo(ctx *gin.Context) {
         return
     }
 
-    ctx.JSON(http.StatusOK,item,)
+	ctx.JSON(http.StatusOK, gin.H{
+        "data": item,
+    })
 }
 func (controller Controller) DeleteItem(ctx *gin.Context) {
     id, _ := strconv.Atoi(ctx.Param("id"))

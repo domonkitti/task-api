@@ -4,9 +4,8 @@ import "task-api/internal/constant"
 
 type RequestItem struct {
 	Title    string  `binding:"required"`
-	Amount    float64 
-	//`binding:"gte=5"`
-	Quantity uint
+	Price    float64 `binding:"gte=0"`
+	Quantity uint `binding:"gte=0"`
 }
 
 type RequestFindItem struct {
@@ -22,7 +21,7 @@ type RequestUpdateItem struct {
 
 type RequestUpdateIteminfo struct {
 	Title    string  `json:"title"`
-    Amount    float64 `json:"Amount"`
+    Price    float64 `json:"price"`
     Quantity uint     `json:"quantity"`
 }
 

@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"task-api/internal/auth"
 	"task-api/internal/item"
-	"task-api/internal/mylog"
+	//"task-api/internal/mylog"
 	"task-api/internal/user"
 	"time"
 
@@ -21,31 +21,20 @@ import (
 	"gorm.io/gorm"
 )
 
-// POST 	/items
-// GET 		/items?status=xxxxx
-// PATCH	/items/:id
-
-// GET 		/items/:id
-// PUT		/items/:id
-// DELETE 	/items/:id
-func Logger() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        t := time.Now()
-        // Set example variable
-        c.Set("example", "12345")
-		c.Set("example2", "1")
-        log.Println("---- Before ----")
-        // before request
-        c.Next()
-        log.Println("---- After ----")
-        // after request
-        latency := time.Since(t)
-        log.Print(latency)
-        // access the status we are sending
-        status := c.Writer.Status()
-        log.Println(status)
-    }      
-}
+// func Logger() gin.HandlerFunc {
+//     return func(c *gin.Context) {
+//         t := time.Now()
+//         c.Set("example", "12345")
+// 		c.Set("example2", "1")
+//         log.Println("---- Before ----")
+//         c.Next()
+//         log.Println("---- After ----")
+//         latency := time.Since(t)
+//         log.Print(latency)
+//         status := c.Writer.Status()
+//         log.Println(status)
+//     }      
+// }
 
 func main() {
 	err := godotenv.Load()
@@ -72,12 +61,12 @@ func main() {
 	config := cors.DefaultConfig()
 	// frontend URL
 	config.AllowOrigins = []string{
-		"http://localhost:8000",
-		"http://127.0.0.1:8000",
+		"http://localhost:3000",
+		"http://127.0.0.1:3000",
 	}
-	r.Use(mylog.Logger2())
+	config.AllowCredentials = true
+	
 	r.Use(cors.New(config))
-	r.Use(Logger())
 
 	r.GET("/version", func(c *gin.Context) {
 		version, err := GetLatestDBVersion(db)
@@ -105,13 +94,12 @@ func main() {
 	// Register router
 	userController := user.NewController(db,os.Getenv("JWT_SECRET"))
 	r.POST("/login",userController.Login)
+	r.GET("/items/", controller.FindItems)
     items := r.Group("/items")
-	// items.Use(mylog.Logger2())
-	//items.Use(auth.BasicAuth())
-	items.Use(auth.Guard(os.Getenv("JWT_SECRET")))
+	items.Use(auth.Guard(os.Getenv("JWT_SECRET"))) //ปิดแปปทำงายยาก
     {
         items.POST("/", controller.CreateItem)
-        items.GET("/", controller.FindItems)
+        //items.GET("/", controller.FindItems)
         items.PATCH("/:id", controller.UpdateItemStatus)
 		items.GET("/:id", controller.FindItemByID)
 		items.PUT("/:id", controller.UpdateIteminfo)

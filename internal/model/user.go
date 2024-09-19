@@ -4,7 +4,9 @@ type User struct {
 	ID       uint   `json:"id" gorm:"primaryKey"`
 	Username string `json:"username"`
 	// hashed password
-	Password string
+	Password string;
+	Class string
+	
 }
 
 func (u User) Exists() bool {

@@ -25,14 +25,19 @@ func (repo Repository) Find(query model.RequestFindItem) ([]model.Item, error) {
 
     db := repo.Database
 
+    // เพิ่มเงื่อนไขการค้นหา
     if query.Statuses != "" {
         db = db.Where("status = ?", query.Statuses)
     }
 
     if query.Title != "" {
-        db = db.Where("title = ?", query.Statuses)
+        db = db.Where("title = ?", query.Title)
     }
 
+    // เรียงลำดับตามฟิลด์ที่ต้องการ (ตัวอย่างเช่น id)
+    db = db.Order("id ASC")
+
+    // ดึงข้อมูล
     if err := db.Find(&results).Error; err != nil {
         return results, err
     }

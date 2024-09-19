@@ -16,7 +16,8 @@ func Guard(secret string) gin.HandlerFunc {
 		auth, err := c.Cookie("token")
 		if err != nil {
 			log.Println("Token missing in cookie")
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{"message": "กรุณา login"})
+			c.Abort()
 			return
 		}
 
@@ -25,15 +26,15 @@ func Guard(secret string) gin.HandlerFunc {
 
 		token, err := verifyToken(tokenString, secret)
 		if err != nil {
-			log.Printf("Token verification failed: %v\\n", err)
-			c.AbortWithStatus(http.StatusUnauthorized)
+			log.Printf("Token verification failed: %v\n", err)
+			c.JSON(http.StatusUnauthorized, gin.H{"message": "กรุณา login"})
+			c.Abort()
 			return
 		}
 
-		log.Printf("Token verified successfully. Claims: %+v\\n", token.Claims)
+		log.Printf("Token verified successfully. Claims: %+v\n", token.Claims)
 	}
 }
-
 func verifyToken(tokenString string, secret string) (*jwt.Token, error) {
 	// Parse the token with the secret key
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {

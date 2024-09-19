@@ -20,7 +20,7 @@ func NewService(db *gorm.DB) Service {
 func (service Service) Create(req model.RequestItem) (model.Item, error) {
 	item := model.Item{
 		Title:    req.Title,
-		Amount:    req.Amount,
+		Price:    req.Price,
 		Quantity: req.Quantity,
 		Status:   constant.ItemPendingStatus,
 	}
@@ -67,7 +67,7 @@ func (service Service) UpdateIteminfo(id uint, req model.RequestUpdateIteminfo) 
 
 	// อัปเดตฟิลด์ต่างๆ
 	item.Title = req.Title
-	item.Amount = req.Amount
+	item.Price = req.Price
 	item.Quantity = req.Quantity
 
 	// แทนที่ข้อมูลในฐานข้อมูล
