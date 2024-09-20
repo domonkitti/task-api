@@ -94,6 +94,7 @@ func main() {
 	// Register router
 	userController := user.NewController(db,os.Getenv("JWT_SECRET"))
 	r.POST("/login",userController.Login)
+	r.POST("/signup",userController.Signup)
 	r.GET("/items/", controller.FindItems)
     items := r.Group("/items")
 	items.Use(auth.Guard(os.Getenv("JWT_SECRET"))) //ปิดแปปทำงายยาก

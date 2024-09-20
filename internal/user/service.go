@@ -57,3 +57,20 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 //แล้วทำไม อา.เอาฟังก์ชั่นสร้างtoken ไปไว้ที่ aunt.go ละ?
+func (service Service) Signup(req model.RequestLogin) (model.User, error) {
+	//แฮชก่อน
+	hashedPassword, err := HashPassword(req.Password)
+	if err != nil {
+		return model.User{}, err
+	}
+	user := model.User{
+		Username: req.Username,
+		Password: hashedPassword,
+	}
+
+	if err := service.Repository.Signup(&user); err != nil {
+		return model.User{}, err
+	}
+
+	return user, nil
+}

@@ -53,3 +53,27 @@ func (controller Controller) Login(ctx *gin.Context) {
 		"message": "login succeeed",
 	})
 }
+func (controller Controller) Signup(ctx *gin.Context) {
+	// Bind
+	var request model.RequestLogin
+
+	if err := ctx.Bind(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": (err),
+		})
+		return
+	}
+
+	// Create item
+	user, err := controller.Service.Signup(request)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusCreated, gin.H{
+		"message":  "Login successful",
+		"username": user.Username,
+	})
+}
