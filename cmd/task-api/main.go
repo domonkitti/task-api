@@ -45,7 +45,7 @@ func main() {
 	// Connect database
 	db, err := gorm.Open(
 		postgres.Open(
-			os.Getenv("Pserver"),
+			os.Getenv("DATABASE_URL"),
 		),
 	)
 	if err != nil {
