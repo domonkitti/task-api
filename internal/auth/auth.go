@@ -11,7 +11,7 @@ func CreateToken(username string, secret string) (string, error) {
 	var t *jwt.Token
 
 	t = jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
-		Audience:  jwt.ClaimStrings{username},
+		Audience:  jwt.ClaimStrings{username},//เราสามารถเก็บค่าไว้มากกว่านี้เยอะจะตั้ง user id บลาๆ
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * time.Second)),
 	})
 

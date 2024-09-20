@@ -7,5 +7,6 @@ type Item struct {
 	Title    string              `json:"title"`
 	Price   float64             `json:"price"`
 	Quantity uint                `json:"quantity"`
+	Owner string				`json:"owner"`
 	Status   constant.ItemStatus `json:"status"`
 }

@@ -10,7 +10,6 @@ import (
 	"syscall"
 	"task-api/internal/auth"
 	"task-api/internal/item"
-	//"task-api/internal/mylog"
 	"task-api/internal/user"
 	"time"
 
@@ -21,20 +20,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// func Logger() gin.HandlerFunc {
-//     return func(c *gin.Context) {
-//         t := time.Now()
-//         c.Set("example", "12345")
-// 		c.Set("example2", "1")
-//         log.Println("---- Before ----")
-//         c.Next()
-//         log.Println("---- After ----")
-//         latency := time.Since(t)
-//         log.Print(latency)
-//         status := c.Writer.Status()
-//         log.Println(status)
-//     }      
-// }
 
 func main() {
 	err := godotenv.Load()
@@ -76,21 +61,6 @@ func main() {
 		}
 		c.JSON(http.StatusOK, gin.H{"version": version})
 	})
-	r.GET("/test", func(ctx *gin.Context) {
-		fmt.Println("------Test---------")
-		value, exists := ctx.Get("example")
-		log.Printf("default example? = %v, %T \n", value ,value)
-        if exists {
-            log.Println("example = ", value)
-        } else {
-            log.Println("example does not exists")
-        }
-		// for i :=0; i<20; i++{
-		// 	fmt.Println(i)
-		// 	time.Sleep(1 * time.Second)
-		// }
-        ctx.JSON(201, "test response")
-    })
 	// Register router
 	userController := user.NewController(db,os.Getenv("JWT_SECRET"))
 	r.POST("/login",userController.Login)
@@ -98,6 +68,7 @@ func main() {
 	r.GET("/items/", controller.FindItems)
     items := r.Group("/items")
 	items.Use(auth.Guard(os.Getenv("JWT_SECRET"))) //ปิดแปปทำงายยาก
+	
     {
         items.POST("/", controller.CreateItem)
         //items.GET("/", controller.FindItems)

@@ -6,6 +6,7 @@ type RequestItem struct {
 	Title    string  `binding:"required"`
 	Price    float64 `binding:"gte=0"`
 	Quantity uint `binding:"gte=0"`
+	Owner string
 }
 
 type RequestFindItem struct {

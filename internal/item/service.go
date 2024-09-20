@@ -22,6 +22,7 @@ func (service Service) Create(req model.RequestItem) (model.Item, error) {
 		Title:    req.Title,
 		Price:    req.Price,
 		Quantity: req.Quantity,
+		Owner:	  req.Owner,
 		Status:   constant.ItemPendingStatus,
 	}
 

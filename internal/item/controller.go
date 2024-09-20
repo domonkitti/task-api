@@ -54,29 +54,29 @@ func getValidationErrors(err error) []ApiError {
 }
 //สร้างของใหม่
 func (controller Controller) CreateItem(ctx *gin.Context) {
-	// Bind
-	var request model.RequestItem
+    username := ctx.MustGet("username").(string) // เพิ่มขั้นตอนนี้มา
+    var request model.RequestItem
+    if err := ctx.Bind(&request); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{
+            "message": "ข้อมูลไม่ถูกต้อง",
+        })
+        return
+    }
 
-	if err := ctx.Bind(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": getValidationErrors(err),
-		})
-		return
-	}
+    //ขั้นตอนเพิ่ม แทรกOwner ไปใน request
+    request.Owner = username
 
-	// Create item
-	item, err := controller.Service.Create(request)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
+    item, err := controller.Service.Create(request)
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{
+            "message": "เกิดข้อผิดพลาดขณะสร้างข้อมูล",
+        })
+        return
+    }
 
-	// Response
-	ctx.JSON(http.StatusCreated, gin.H{
-		"data": item,
-	})
+    ctx.JSON(http.StatusCreated, gin.H{
+        "data": item,
+    })
 }
 //ทั้งหาและเรียกไอเทมทั้งหมด ตัวอย่างการส่ง query ?title=
 func (controller Controller) FindItems(ctx *gin.Context) {
