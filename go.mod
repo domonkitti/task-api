@@ -4,13 +4,9 @@ go 1.23
 
 require (
 	github.com/gin-gonic/gin v1.10.0
+	github.com/joho/godotenv v1.5.1
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.11
-)
-
-require (
-	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 )
 
 require (

@@ -53,20 +53,16 @@ func getValidationErrors(err error) []ApiError {
 	return nil
 }
 //สร้างของใหม่
-func (controller Controller) CreateItem(ctx *gin.Context) {
-    username := ctx.MustGet("username").(string) // เพิ่มขั้นตอนนี้มา
-    var request model.RequestItem
-    if err := ctx.Bind(&request); err != nil {
+func (controller Controller) CreateProject(ctx *gin.Context) {
+    var request model.RequestProject
+    if err := ctx.ShouldBindJSON(&request); err != nil {
         ctx.JSON(http.StatusBadRequest, gin.H{
             "message": "ข้อมูลไม่ถูกต้อง",
         })
         return
     }
 
-    //ขั้นตอนเพิ่ม แทรกOwner ไปใน request
-    request.Owner = username
-
-    item, err := controller.Service.Create(request)
+    project, err := controller.Service.Create(request)
     if err != nil {
         ctx.JSON(http.StatusInternalServerError, gin.H{
             "message": "เกิดข้อผิดพลาดขณะสร้างข้อมูล",
@@ -75,120 +71,190 @@ func (controller Controller) CreateItem(ctx *gin.Context) {
     }
 
     ctx.JSON(http.StatusCreated, gin.H{
-        "data": item,
+        "data": project,
     })
 }
-//ทั้งหาและเรียกไอเทมทั้งหมด ตัวอย่างการส่ง query ?title=
-func (controller Controller) FindItems(ctx *gin.Context) {
-	// Bind query parameters
-	var	request model.RequestFindItem
-	
-	if err := ctx.BindQuery(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": err,
-		})
-		return
-	}
-
-	// Find
-	items, err := controller.Service.Find(request)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err,
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK,gin.H{
-		"data":items,})
-}
-//หาไอเทมชิ้นเดียว ตัวอย่างการส่ง paramitorหลัง/
-func (controller Controller) FindItemByID(ctx *gin.Context) {
-    id, err := strconv.Atoi(ctx.Param("id"))
-    if err != nil {
-        ctx.JSON(http.StatusBadRequest, gin.H{
-            "message": "Invalid ID",
-        })
-        return
-    }
-
-    item, err := controller.Service.FindByID(uint(id))
+// Get All Projects
+func (controller Controller) GetAllProjects(ctx *gin.Context) {
+    projects, err := controller.Service.GetAll()
     if err != nil {
         ctx.JSON(http.StatusInternalServerError, gin.H{
-            "message": err,
-        })
-        return
-    }
-
-    ctx.JSON(http.StatusOK,gin.H{
-		"data":item,})
-}
-
-//อัพเดท status
-func (controller Controller) UpdateItemStatus(ctx *gin.Context) {
-	// Bind
-	var (
-		request model.RequestUpdateItem
-	)
-
-	if err := ctx.Bind(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": err,
-		})
-		return
-	}
-
-	// Path param
-	id, _ := strconv.Atoi(ctx.Param("id"))
-
-	// Update status
-	item, err := controller.Service.UpdateStatus(uint(id), request.Status)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err,
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK,gin.H{
-		"data": item},)
-}
-//อัพเดทข้อมูลทั่วไป
-func (controller Controller) UpdateIteminfo(ctx *gin.Context) {
-    var request model.RequestUpdateIteminfo
-
-    if err := ctx.BindJSON(&request); err != nil {
-        ctx.JSON(http.StatusBadRequest, gin.H{
-            "message": err.Error(),
-        })
-        return
-    }
-
-    id, _ := strconv.Atoi(ctx.Param("id"))
-
-    item, err := controller.Service.UpdateIteminfo(uint(id), request)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{
-            "message": err.Error(),
-        })
-        return
-    }
-
-	ctx.JSON(http.StatusOK, gin.H{
-        "data": item,
-    })
-}
-func (controller Controller) DeleteItem(ctx *gin.Context) {
-    id, _ := strconv.Atoi(ctx.Param("id"))
-
-    if err := controller.Service.Delete(uint(id)); err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{
-            "message": err.Error(),
+            "message": "เกิดข้อผิดพลาดขณะดึงข้อมูล",
         })
         return
     }
 
     ctx.JSON(http.StatusOK, gin.H{
-        "message": "Item deleted successfully",
+        "data": projects,
     })
+}
+
+// Get Project By ID
+func (controller Controller) GetProjectByID(ctx *gin.Context) {
+    idParam := ctx.Param("id")
+    id, err := strconv.Atoi(idParam)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{
+            "message": "ID ไม่ถูกต้อง",
+        })
+        return
+    }
+
+    project, err := controller.Service.GetByID(uint(id))
+    if err != nil {
+        ctx.JSON(http.StatusNotFound, gin.H{
+            "message": "ไม่พบข้อมูลโครงการ",
+        })
+        return
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{
+        "data": project,
+    })
+}
+func (controller Controller) GetSubTasksByProjectID(ctx *gin.Context) {
+    idParam := ctx.Param("project_id")
+    projectID, err := strconv.Atoi(idParam)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{
+            "message": "project_id ไม่ถูกต้อง",
+        })
+        return
+    }
+
+    subTasks, err := controller.Service.GetSubTasksByProjectID(uint(projectID))
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{
+            "message": "เกิดข้อผิดพลาดขณะดึงข้อมูลงานย่อย",
+        })
+        return
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{
+        "data": subTasks,
+    })
+}
+
+func (c Controller) CreateSubTask(ctx *gin.Context) {
+    var (
+        request model.CreateSubTaskRequest
+        projectID uint
+    )
+
+    if id, err := strconv.Atoi(ctx.Param("projectId")); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "projectId ไม่ถูกต้อง"})
+        return
+    } else {
+        projectID = uint(id)
+    }
+
+    if err := ctx.ShouldBindJSON(&request); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "ข้อมูลไม่ถูกต้อง"})
+        return
+    }
+
+    subtask, err := c.Service.CreateSubTask(projectID, request.SubTaskName, request.TotalFunding)
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{"error": "เกิดข้อผิดพลาดในการสร้างงานย่อย"})
+        return
+    }
+
+    ctx.JSON(http.StatusCreated, gin.H{"data": subtask})
+}
+func (c Controller) DeleteSubTask(ctx *gin.Context) {
+    projectIDParam := ctx.Param("projectId")
+    draftIDParam := ctx.Query("draftId") // รับจาก query param
+
+    projectID, err := strconv.Atoi(projectIDParam)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "projectId ไม่ถูกต้อง"})
+        return
+    }
+
+    draftID, err := strconv.Atoi(draftIDParam)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "draftId ไม่ถูกต้อง"})
+        return
+    }
+
+    err = c.Service.DeleteSubTask(uint(projectID), uint(draftID))
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{"error": "เกิดข้อผิดพลาดในการลบงานย่อย"})
+        return
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"message": "ลบงานย่อยสำเร็จ"})
+}
+//หน้าลงทุนแต่ละปี
+func (c Controller) CreateBudgetRequests(ctx *gin.Context) {
+    // ✅ ใช้ subProjectId ตาม route
+    subProjectIDParam := ctx.Param("subProjectId")
+
+    subProjectIDInt, err := strconv.Atoi(subProjectIDParam)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "SubProject ID ไม่ถูกต้อง"})
+        return
+    }
+
+    var inputs []model.BudgetRequestDraftInput
+    if err := ctx.ShouldBindJSON(&inputs); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "ข้อมูลไม่ถูกต้อง"})
+        return
+    }
+
+    if err := c.Service.CreateOrUpdateBudgetRequests(uint(subProjectIDInt), inputs); err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{"error": "ไม่สามารถบันทึกข้อมูลได้"})
+        return
+    }
+
+    ctx.JSON(http.StatusCreated, gin.H{"message": "บันทึกข้อมูลสำเร็จ"})
+}
+func (c Controller) GetBudgetRequestsBySubtaskId(ctx *gin.Context) {
+	subtaskIDParam := ctx.Param("subProjectId")
+	subtaskID, err := strconv.Atoi(subtaskIDParam)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "SubProject ID ไม่ถูกต้อง"})
+		return
+	}
+
+	// ✅ ดึง query param requestedYear (optional)
+	requestedYearParam := ctx.Query("requestedYear")
+	var requestedYear *int
+
+	if requestedYearParam != "" {
+		year, err := strconv.Atoi(requestedYearParam)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Requested Year ไม่ถูกต้อง"})
+			return
+		}
+		requestedYear = &year // ✅ assign ค่าเข้า pointer
+	}
+
+	result, err := c.Service.GetBudgetRequestsBySubtaskId(uint(subtaskID), requestedYear)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "ไม่สามารถดึงข้อมูลได้"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, result)
+}
+//ทำsummary
+func (c Controller) GetBudgetRequestsByProjectID(ctx *gin.Context) {
+	projectIDParam := ctx.Param("projectId")
+
+	// แปลง projectId จาก string -> uint
+	projectID, err := strconv.Atoi(projectIDParam)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Project ID ไม่ถูกต้อง"})
+		return
+	}
+
+	// เรียก Service
+	data, err := c.Service.GetBudgetRequestsByProjectID(uint(projectID))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "ไม่สามารถดึงข้อมูลได้"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, data)
 }
